@@ -1,0 +1,4 @@
+0. It allows dimensions between DIM_MIN and DIM_MAX (from 3x3 to 9x9).
+1. It's represented with an array of N x N dimensions.
+2. Function greet() is called to greet the player.
+3. I need to implement init(), draw(), move(), and won().
