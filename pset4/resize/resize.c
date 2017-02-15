@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <sys/wait.h>
 
 #include "bmp.h"
 
@@ -69,9 +70,8 @@ int main (int argc, char *argv[])
   // if rounded resize value is 1 - just copy the image
   if (ceil(value) == 1)
   {
-    copy(infile, outfile);
+    return (copy(infile, outfile));
   }
-
   // resize bitmap by given value
   bi.biWidth *= round(value);
   bi.biHeight *= round(value);
@@ -81,13 +81,16 @@ int main (int argc, char *argv[])
   return 0;
 }
 
+// runs external copy program to copy the image
 int copy(char *infile, char *outfile)
 {
+  // calculate length of the command, including \0 terminator
   int command_length = strlen("./copy ") + strlen(infile) + 1 + strlen(outfile) + 1;
   char command[command_length];
-  // assign whole command to command
+  // assign whole command to variable
   snprintf(command, sizeof(command), "./copy %s %s", infile, outfile);
-  // launch command in terminal
-  int status = system(command);
+  // launch command in terminal, WEXITSTATUS returns exit code from child comm.
+  int status = WEXITSTATUS(system(command));
+  // return status from the copy program
   return status;
 }
