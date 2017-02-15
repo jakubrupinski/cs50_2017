@@ -1,5 +1,11 @@
+/**
+ * Resizes BMP images n times (basically enlarges images)
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <string.h>
 
 #include "bmp.h"
 
@@ -8,7 +14,7 @@ int main (int argc, char *argv[])
   // check if correct number of arguments used
   if (argc != 4)
   {
-    fprintf(stderr, "Usage: ./resize float_value infile outfile\n");
+    fprintf(stderr, "Usage: ./resize value infile outfile\n");
     return 1;
   }
 
@@ -58,7 +64,23 @@ int main (int argc, char *argv[])
       return 4;
   }
 
-  
+  // if rounded resize value is 1 - just copy the image
+  if (ceil(value) == 1)
+  {
+    int command_length = strlen("./copy ") + strlen(infile) + 1 + strlen(outfile) + 1;
+    char command[command_length];
+    // assign whole command to command
+    snprintf(command, sizeof(command), "./copy %s %s", infile, outfile);
+    // launch command in terminal
+    int status = system(command);
+    return status;
+  }
+
+  // resize bitmap by given value
+  bi.biWidth *= round(value);
+  bi.biHeight *= round(value);
+
+
 
   return 0;
 }
