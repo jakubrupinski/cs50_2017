@@ -1,0 +1,35 @@
+1.  What’s stdint.h?
+  It's a header that includes several new integer types from C99 that were not present/sufficient enough in the older version on C. It was implemented to improve portability of the code.
+
+2.  What’s the point of using uint8_t, uint32_t, int32_t, and uint16_t in a program?
+  We use those so we can create aliases for default Windows values (DWORD, WORD etc.) in our C programs, and call them by their name.
+
+3.  How many bytes is a BYTE, a DWORD, a LONG, and a WORD, respectively?
+  BYTE is 1 byte, WORD is a 2 bytes unsigned, LONG is 4 bytes long, and DWORD is 4 bytes unsigned.
+
+4.  What (in ASCII, decimal, or hexadecimal) must the first two bytes of any BMP file be? Leading bytes used to identify file formats (with high probability) are generally called "magic numbers."
+  First two bytes have to be equal to ASCII characters "BM", which in hexadecimal is 424d.
+
+5.  What’s the difference between bfSize and biSize?
+  bfSize is file size (in bytes) of the bitmap file, while biSize represents the number of bytes required by the structure (which is the picture itself).
+
+6.  What does it mean if biHeight is negative?
+  If biHeight is negative - it means that the provided picture should be read/viewed from top to bottom, and it's point of origin starts at upper-left corner.
+
+7.  What field in BITMAPINFOHEADER specifies the BMP’s color depth (i.e., bits per pixel)?
+  biBitCount is the field that determines number of bits per pixel - it can have a value between 0 and 32.
+
+8.  Why might fopen return NULL in lines 24 and 32 of copy.c?
+  fopen might return NULL value if the program cannot open the input file (line 24) or the program cannot open the output file to write data to.
+
+9.  Why is the third argument to fread always 1 in our code?
+  Third argument of fread represents the number of "readings" from the provided file. For example, if it would be equal to 10, fread would read the whole size of provided file 10 times, but when it's equal to 1 - it reads it only once.
+
+10. What value does line 65 of copy.c assign to padding if bi.biWidth is 3?
+It would be equal to 3 (Although I still am trying to check why sizeof(RGBTRIPLE) equals 3).
+
+11. What does fseek do?
+  It "moves" the current cursor position by specified number of bytes (equal to variable padding) to skip padding.
+
+12. What is SEEK_CUR?
+It's the current position indicator (current position of program's "cursor" in file).
