@@ -9,6 +9,8 @@
 
 #include "bmp.h"
 
+int copy(char *infile, char *outfile);
+
 int main (int argc, char *argv[])
 {
   // check if correct number of arguments used
@@ -67,13 +69,7 @@ int main (int argc, char *argv[])
   // if rounded resize value is 1 - just copy the image
   if (ceil(value) == 1)
   {
-    int command_length = strlen("./copy ") + strlen(infile) + 1 + strlen(outfile) + 1;
-    char command[command_length];
-    // assign whole command to command
-    snprintf(command, sizeof(command), "./copy %s %s", infile, outfile);
-    // launch command in terminal
-    int status = system(command);
-    return status;
+    copy(infile, outfile);
   }
 
   // resize bitmap by given value
@@ -83,4 +79,15 @@ int main (int argc, char *argv[])
 
 
   return 0;
+}
+
+int copy(char *infile, char *outfile)
+{
+  int command_length = strlen("./copy ") + strlen(infile) + 1 + strlen(outfile) + 1;
+  char command[command_length];
+  // assign whole command to command
+  snprintf(command, sizeof(command), "./copy %s %s", infile, outfile);
+  // launch command in terminal
+  int status = system(command);
+  return status;
 }
