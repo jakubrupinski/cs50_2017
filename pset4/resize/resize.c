@@ -73,15 +73,18 @@ int main (int argc, char *argv[])
       return 4;
   }
 
+  // determine original's padding for scanlines
+  int og_padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+
   // resize bitmap by given value
   bi.biWidth *= value;
   bi.biHeight *= value;
 
-  // determine padding for scanlines
-  int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+  // determine resized padding
+  int resized_padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
 
   // update the rest of parameters
-  bi.biSizeImage = ((sizeof(RGBTRIPLE) * bi.biWidth) + padding) * abs(bi.biHeight);
+  bi.biSizeImage = ((sizeof(RGBTRIPLE) * bi.biWidth) + resized_padding) * abs(bi.biHeight);
   bf.bfSize = bi.biSizeImage + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
   // write BITMAPFILEHEADER to output file
@@ -99,6 +102,8 @@ int main (int argc, char *argv[])
           // temporary storage
           RGBTRIPLE triple;
 
+
+
           // read RGB triple from infile
           fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
 
@@ -107,10 +112,10 @@ int main (int argc, char *argv[])
       }
 
       // skip over padding, if any
-      fseek(inptr, padding, SEEK_CUR);
+      fseek(inptr, og_padding, SEEK_CUR);
 
       // then add it back (to demonstrate how)
-      for (int k = 0; k < padding; k++)
+      for (int k = 0; k < resized_padding; k++)
       {
           fputc(0x00, outptr);
       }
