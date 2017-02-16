@@ -49,11 +49,17 @@ int main (int argc, char *argv[])
     return 4;
   }
 
-  // read infile BITMAPFILEHEADER
+  // if rounded resize value is 1 - just copy the image
+  if (ceil(value) == 1)
+  {
+    return (copy(infile, outfile));
+  }
+
+  // read infile's BITMAPFILEHEADER
   BITMAPFILEHEADER bf;
   fread(&bf, sizeof(BITMAPFILEHEADER), 1, inptr);
 
-  // read infile BITMAPINFOHEADER
+  // read infile's BITMAPINFOHEADER
   BITMAPINFOHEADER bi;
   fread(&bi, sizeof(BITMAPINFOHEADER), 1, inptr);
 
@@ -67,29 +73,72 @@ int main (int argc, char *argv[])
       return 4;
   }
 
-  // if rounded resize value is 1 - just copy the image
-  if (ceil(value) == 1)
-  {
-    return (copy(infile, outfile));
-  }
   // resize bitmap by given value
-  bi.biWidth *= round(value);
-  bi.biHeight *= round(value);
+  bi.biWidth *= value;
+  bi.biHeight *= value;
 
+  // determine padding for scanlines
+  int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
 
+  // update the rest of parameters
+  bi.biSizeImage = ((sizeof(RGBTRIPLE) * bi.biWidth) + padding) * abs(bi.biHeight);
+  bf.bfSize = bi.biSizeImage + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
+  // write BITMAPFILEHEADER to output file
+  fwrite(&bf, sizeof(BITMAPFILEHEADER), 1, outptr);
+
+  // write BITMAPINFOHEADER to output file
+  fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, outptr);
+
+  // iterate over infile's scanlines
+  for (int i = 0, biHeight = abs(bi.biHeight); i < biHeight; i++)
+  {
+      // iterate over pixels in scanline
+      for (int j = 0; j < bi.biWidth; j++)
+      {
+          // temporary storage
+          RGBTRIPLE triple;
+
+          // read RGB triple from infile
+          fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
+
+          // write RGB triple to outfile
+          fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+      }
+
+      // skip over padding, if any
+      fseek(inptr, padding, SEEK_CUR);
+
+      // then add it back (to demonstrate how)
+      for (int k = 0; k < padding; k++)
+      {
+          fputc(0x00, outptr);
+      }
+  }
+
+  // close infile
+  fclose(inptr);
+
+  // close outfile
+  fclose(outptr);
+
+  // success
   return 0;
 }
 
-// runs external copy program to copy the image
+/**
+* Runs external copy program to copy the image
+**/
 int copy(char *infile, char *outfile)
 {
   // calculate length of the command, including \0 terminator
   int command_length = strlen("./copy ") + strlen(infile) + 1 + strlen(outfile) + 1;
   char command[command_length];
+
   // assign whole command to variable
   snprintf(command, sizeof(command), "./copy %s %s", infile, outfile);
   // launch command in terminal, WEXITSTATUS returns exit code from child comm.
+
   int status = WEXITSTATUS(system(command));
   // return status from the copy program
   return status;
