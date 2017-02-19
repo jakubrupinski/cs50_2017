@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
 #include <sys/wait.h>
 
@@ -50,7 +49,7 @@ int main (int argc, char *argv[])
   }
 
   // if rounded resize value is 1 - just copy the image
-  if (ceil(value) == 1)
+  if (value == 1)
   {
     return (copy(infile, outfile));
   }
@@ -77,6 +76,7 @@ int main (int argc, char *argv[])
   int og_padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
 
   // resize bitmap by given value
+  long old_width = bi.biWidth;
   bi.biWidth *= value;
   bi.biHeight *= value;
 
@@ -87,6 +87,9 @@ int main (int argc, char *argv[])
   bi.biSizeImage = ((sizeof(RGBTRIPLE) * bi.biWidth) + resized_padding) * abs(bi.biHeight);
   bf.bfSize = bi.biSizeImage + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
+  // create variable for rewinding current fseek()
+  long rewinder = -(old_width * sizeof(RGBTRIPLE) + og_padding);
+
   // write BITMAPFILEHEADER to output file
   fwrite(&bf, sizeof(BITMAPFILEHEADER), 1, outptr);
 
@@ -96,29 +99,41 @@ int main (int argc, char *argv[])
   // iterate over infile's scanlines
   for (int i = 0, biHeight = abs(bi.biHeight); i < biHeight; i++)
   {
-      // iterate over pixels in scanline
-      for (int j = 0; j < bi.biWidth; j++)
+    // iterate over pixels in scanline
+    for (int j = 0; j < bi.biWidth; j++)
+    {
+      // temporary storage
+      RGBTRIPLE triple;
+
+      // read RGB triple from infile
+      fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
+
+      // resize scanlines vertically (basically copy them n times)
+      for (int v_row = 0; v_row < value; v_row++)
       {
-          // temporary storage
-          RGBTRIPLE triple;
-
-
-
-          // read RGB triple from infile
-          fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
-
-          // write RGB triple to outfile
+        // resize horizontally (write each pixel n times)
+        for (int h_row = 0; h_row < value; h_row++)
+        {
+          // write RGB triple to outfile (write original pixel counter times)
           fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
-      }
+        }
 
-      // skip over padding, if any
-      fseek(inptr, og_padding, SEEK_CUR);
+        // skip over padding, if any
+        fseek(inptr, og_padding, SEEK_CUR);
 
-      // then add it back (to demonstrate how)
-      for (int k = 0; k < resized_padding; k++)
-      {
-          fputc(0x00, outptr);
+        // then add it back (to demonstrate how)
+        for (int k = 0; k < resized_padding; k++)
+        {
+            fputc(0x00, outptr);
+        }
+
+        // rewind original image cursor back for vertical resizing
+        if (v_row > 0)
+        {
+          fseek(inptr, rewinder, SEEK_CUR);
+        }
       }
+    }
   }
 
   // close infile
