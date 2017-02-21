@@ -93,7 +93,6 @@ int main(int argc, char *argv[])
         // write horizontal scanlines n-times (vertical resize)
         for (int v_row = 0; v_row < n; v_row++)
         {
-            printf("Current position in inptr: %lu\n", ftell(inptr));
             // iterate over pixels in scanline
             for (int j = 0; j < og_biWidth; j++)
             {
@@ -103,8 +102,6 @@ int main(int argc, char *argv[])
                 // read RGB triple from infile
                 fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
 
-                printf("inptr after reading: %lu\n", ftell(inptr));
-
                 // write horizontal scanline n-times (resize)
                 for (int h_row = 0; h_row < n; h_row++)
                 {
@@ -112,8 +109,6 @@ int main(int argc, char *argv[])
                     fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
                 }
             }
-            // test
-            printf("inptr after scanline (before padding): %lu\n", ftell(inptr));
 
             // skip over og_padding, if any
             fseek(inptr, og_padding, SEEK_CUR);
@@ -124,15 +119,11 @@ int main(int argc, char *argv[])
                 fputc(0x00, outptr);
             }
 
-            // test
-            printf("inptr after padding: %lu\n", ftell(inptr));
-
             if (v_row < n - 1)
             {
               // go back with seeker for vertical resizing of scanlines
               fseek(inptr, -(og_biWidth * (int)sizeof(RGBTRIPLE) + og_padding), SEEK_CUR);
             }
-            printf("inptr after checking v_row: %lu\n", ftell(inptr));
         }
     }
 
