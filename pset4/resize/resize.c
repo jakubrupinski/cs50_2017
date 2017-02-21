@@ -64,17 +64,20 @@ int main(int argc, char *argv[])
     }
 
     // determine padding for scanlines of infile
-    int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+    int og_padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+    // keep infile's width and heigth
+    LONG og_biWidth = bi.biWidth,
+        og_biHeight = bi.biHeight;
 
     // calculate outfile's header parameters
     bi.biWidth *= n;
     bi.biHeight *= n;
 
     // determine padding for scanlines of outfile
-    int res_padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+    int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
 
     // calculate rest of outfile's header parameters
-    bi.biSizeImage = abs(bi.biHeight) * (bi.biWidth * sizeof(RGBTRIPLE) + res_padding);
+    bi.biSizeImage = abs(bi.biHeight) * (bi.biWidth * sizeof(RGBTRIPLE) + padding);
     bf.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + bi.biSizeImage;
 
 
@@ -85,19 +88,22 @@ int main(int argc, char *argv[])
     fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, outptr);
 
     // iterate over infile's scanlines
-    for (int i = 0, biHeight = abs(bi.biHeight); i < biHeight; i++)
+    for (int i = 0, biHeight = abs(og_biHeight); i < biHeight; i++)
     {
-        // write vertical scanlines n-times (resize)
+        // write horizontal scanlines n-times (vertical resize)
         for (int v_row = 0; v_row < n; v_row++)
         {
+            printf("Current position in inptr: %lu\n", ftell(inptr));
             // iterate over pixels in scanline
-            for (int j = 0; j < bi.biWidth; j++)
+            for (int j = 0; j < og_biWidth; j++)
             {
                 // temporary storage
                 RGBTRIPLE triple;
 
                 // read RGB triple from infile
                 fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
+
+                printf("inptr after reading: %lu\n", ftell(inptr));
 
                 // write horizontal scanline n-times (resize)
                 for (int h_row = 0; h_row < n; h_row++)
@@ -106,15 +112,27 @@ int main(int argc, char *argv[])
                     fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
                 }
             }
+            // test
+            printf("inptr after scanline (before padding): %lu\n", ftell(inptr));
 
-            // skip over padding, if any
-            fseek(inptr, padding, SEEK_CUR);
+            // skip over og_padding, if any
+            fseek(inptr, og_padding, SEEK_CUR);
 
             // then add it back (to demonstrate how)
-            for (int k = 0; k < res_padding; k++)
+            for (int k = 0; k < padding; k++)
             {
                 fputc(0x00, outptr);
             }
+
+            // test
+            printf("inptr after padding: %lu\n", ftell(inptr));
+
+            if (v_row < n - 1)
+            {
+              // go back with seeker for vertical resizing of scanlines
+              fseek(inptr, -(og_biWidth * (int)sizeof(RGBTRIPLE) + og_padding), SEEK_CUR);
+            }
+            printf("inptr after checking v_row: %lu\n", ftell(inptr));
         }
     }
 
