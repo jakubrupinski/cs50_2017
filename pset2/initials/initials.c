@@ -1,18 +1,20 @@
 #include <stdio.h>
-#include <cs50.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
-void initials (string name);
+void initials (char *name);
 
 int main(void)
 {
-    string name = get_string();
+    char *name = malloc (100 * sizeof(char));
+    fgets(name, 100, stdin);
+
     initials(name);
     return 0;
 }
 
-void initials (string name)
+void initials (char *name)
 {
     for (int i = 0, n = strlen(name); i < n; i++)  // skip first argument (program name)
     {
