@@ -1,15 +1,16 @@
 #include <stdio.h>
-#include <cs50.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #define ALPHABET_LENGTH 26
 
 
-string encrypt(string text, int key);
+char  *encrypt(char  *text, int key);
 
 
-int main(int argc, string argv[])
+int main(int argc, char  *argv[])
 {
     // if not enough or more than 1 arguments - exit and return an error
     if (argc != 2)  
@@ -18,11 +19,11 @@ int main(int argc, string argv[])
         return 1;
     }
     
-    string plaintext, ciphertext;
+    char  *plaintext = malloc(100 * sizeof(char)), *ciphertext;
     int key = atoi(argv[1]);    // convert console key argument to int
     
     printf("plaintext: ");
-    plaintext = get_string();
+    plaintext = fgets(plaintext, 100, stdin);
     ciphertext = encrypt(plaintext, key);
     
     printf("ciphertext: %s\n", ciphertext);
@@ -30,11 +31,11 @@ int main(int argc, string argv[])
     return 0;
 }
 
-string encrypt(string plaintext, int key)
+char *encrypt(char *plaintext, int key)
 {
     int text_length = strlen(plaintext),
         alphabet_array[ALPHABET_LENGTH];    //this array will hold indexes of each acii letter in alphabet indexing
-    string ciphertext = plaintext; // first copy the plaintext, then encrypt every letter
+    char *ciphertext = plaintext; // first copy the plaintext, then encrypt every letter
     bool has_shifted = false;   //  check if letter has shifted
     
     // assign alphabet to an array for alphabet indexing
