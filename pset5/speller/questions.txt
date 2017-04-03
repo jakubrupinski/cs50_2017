@@ -1,0 +1,42 @@
+0.  Pneumonoultramicroscopicsilicovolcanoconiosis is an English word that refers to a lung disease that is otherwise known as silicosis. It is the longest word in the English language published in a dictionary, the Oxford English Dictionary, which defines it as "an artificial long word said to mean a lung disease caused by inhaling very fine ash and sand dust."
+
+1.  getrusage() returns resource usage measures for who, which for example can be the calling process.
+
+2.  27 members :
+struct rusage {
+               struct timeval ru_utime; /* user CPU time used */
+               struct timeval ru_stime; /* system CPU time used */
+               long   ru_maxrss;        /* maximum resident set size */
+               long   ru_ixrss;         /* integral shared memory size */
+               long   ru_idrss;         /* integral unshared data size */
+               long   ru_isrss;         /* integral unshared stack size */
+               long   ru_minflt;        /* page reclaims (soft page faults) */
+               long   ru_majflt;        /* page faults (hard page faults) */
+               long   ru_nswap;         /* swaps */
+               long   ru_inblock;       /* block input operations */
+               long   ru_oublock;       /* block output operations */
+               long   ru_msgsnd;        /* IPC messages sent */
+               long   ru_msgrcv;        /* IPC messages received */
+               long   ru_nsignals;      /* signals received */
+               long   ru_nvcsw;         /* voluntary context switches */
+               long   ru_nivcsw;        /* involuntary context switches */
+               long   ru_isrss;         /* integral unshared stack size */
+               long   ru_minflt;        /* page reclaims (soft page faults) */
+               long   ru_majflt;        /* page faults (hard page faults) */
+               long   ru_nswap;         /* swaps */
+               long   ru_inblock;       /* block input operations */
+               long   ru_oublock;       /* block output operations */
+               long   ru_msgsnd;        /* IPC messages sent */
+               long   ru_msgrcv;        /* IPC messages received */
+               long   ru_nsignals;      /* signals received */
+               long   ru_nvcsw;         /* voluntary context switches */
+               long   ru_nivcsw;        /* involuntary context switches */
+           };
+
+3.  We reference before and after values because their parent structs are already built in, not user-created, so they are like pointers - that's why we need to dereference them. If we passed them without referencing them, it would give memory address where the whole struct begins and not the values.
+
+4.  main() reads every character from the file until it runs into EOF (end of file). I'm not sure what the third argument in this for loop does. It tries to read alphabetical characters only (and apostrophes, but only if they're not the first character). If the character is a number or the word is too long program will "consume" (skip over) the rest of the current "word" and reset the index to let the new word overwrite old, incorrect values in array. If the next character is not a number nor is it an alphabetical character - it means the word is done, so it appends the string terminator (/0) to finish the current word, adds 1 to current word count, and resets the index to allow for new word to be read. At the end of the for loop program checks current word's spelling and prints out a message if it's misspelled - and then the next iteration begins.
+
+5.  fscanf() is more prone to buffer overflows, and doesn't allow much flexibility when it comes to limiting what user can input. It's also problematic when we want to enter a multiple words as input in terminal - it will not read characters after the first space.
+
+6.  Because they will have constant run time (big O of LENGTH of the longest word in dictionary).
