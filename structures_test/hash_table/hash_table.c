@@ -3,63 +3,117 @@
 
 #define HASH_SIZE 10
 
-// define linkedlist
-typedef struct node
+// define hash_table
+typedef struct hash_tab_elem
 {
     char *string;
-    struct node *prev;
-    struct node *next;
-} linkedlist;
+    struct hash_tab_elem *prev;
+    struct hash_tab_elem *next;
+} hash_table;
 
 // prototyping
-linkedlist *create(char *string);
-linkedlist *insert(linkedlist *list, char *string);
+void insert(char *value);
 int hash(char *string);
+void print_values(hash_table *table);
+void init_hashtable();
 
 // global variable with pointer to head of list
-struct node *head = NULL;
+hash_table *hashtable[HASH_SIZE];
 
 int main(void)
 {
-    int *list[HASH_SIZE];
+    init_hashtable();
+    insert("Joey");
+    insert("Elo");
+    insert("Dziony");
+    insert("Roman");
+    insert("Romanthony");
+    insert("ziomek");
+    insert("euhe");
+    insert("a");
+    insert("ziomek12");
+    insert("ahaha");
+    insert("CHUJU");
 
-    list[hash("Joey")] = insert(list[hash("Joey")], "Joey");
+    // print whole hashtable
+    for (int i = 0; i < HASH_SIZE; ++i)
+    {
+        print_values(hashtable[i]);
+    }
 
-    printf("string in hash %d = %s\n", hash("Joey"), list[hash("Joey")]->string);
     return 0;
 }
 
 int hash(char *string)
 {
-    int sum = 0;
+    int index = 0;
 
     for(int i = 0; string[i] != '\0'; i++)
     {
-        sum += string[i];
+        index += string[i];
     }
 
-    return sum % HASH_SIZE;
+    return index % HASH_SIZE;
 }
 
-linkedlist *create(char *string)
-{
-    linkedlist *new_list = malloc (sizeof(linkedlist));
-    new_list->string = string;
-    new_list->prev = NULL;
-    new_list->next = NULL;
 
-    if (head == NULL)
-        head = new_list;
-    return new_list;
+void insert(char *value)
+{
+    // allocate memory for new node
+    hash_table *new_node = malloc(sizeof(hash_table));
+    if (new_node == NULL)
+    {
+        free(new_node);
+        fprintf(stderr, "could not allocate memory for insertion of \"%s\"\n", value);
+        exit(1);
+    }
+
+    // get hash value for hashtable index
+    int index = hash(value);
+
+    // assign values to new node of hash table
+    new_node->string = value;
+    new_node->prev = hashtable[index];
+    // if there is a node in index already - chain it to new node
+    if (hashtable[index]->next != NULL)
+    {
+        new_node->next = hashtable[index]->next;
+        hashtable[index]->next = new_node;
+    }
+
+    // append it to hash table
+    hashtable[index]->next = new_node;
 }
 
-linkedlist *insert(linkedlist *list, char *string)
+void print_values(hash_table *table)
 {
-    linkedlist *new_node = create(string);
+    hash_table *traversal = table;   
+    // if table index is empty - return
+    if (traversal == NULL)
+        return;
 
-    new_node->next = list;
-    list->prev = new_node;
+    if (traversal->next != NULL)
+        print_values(traversal->next);
+    
+    // if string isn't null print it
+    if (traversal->string != NULL)
+        printf("%s\n", traversal->string);
+}
 
-    head = new_node;
-    return new_node;
+void init_hashtable()
+{
+    // iterate over every index of hash table
+    for(int i = 0; i < HASH_SIZE; i++)
+    {
+        hashtable[i] = malloc(sizeof(hash_table));
+        // check for memory allocation problems
+        if (hashtable[i] == NULL)
+        {
+            fprintf(stderr, "could not allocate memory for hash table\n");
+            free(hashtable[i]);
+            return;
+        }
+        // change next pointer to NULL, just in case compiler doesn't do it itself
+        hashtable[i]->next = NULL;
+    }
 }
