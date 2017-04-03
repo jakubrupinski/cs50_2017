@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <cs50.h>
 
 void pyramid(int n);
 int user_input(void);
@@ -17,7 +16,7 @@ int user_input(void)
     do
     {
         printf("Height(positive integer less than 24): ");
-        height = get_int();
+        scanf("%d", &height);
     }
     while(height < 0 || height >= 24);
     
