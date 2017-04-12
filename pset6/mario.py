@@ -3,8 +3,10 @@
     Author: Jakub Rupinski
 
     Program for printing out Super Mario Bros' "pyramids" in console
-    The height of a pyramid is given by the user when the program is run 
+    The height of a pyramid is given by the user when the program is run
 """
+
+
 def main():
     height = getHeight()
     print_pyramid(height)
@@ -30,9 +32,10 @@ def print_pyramid(height):
     for i in range(1, height + 1):
 
         # print left half of pyramid
-        print((height - i) * " ", end="")
+        spaces = (height - i) * " "
+        print(spaces, end="")
         print(i * "#", end="")
-        # separate two halves with two spaces 
+        # separate two halves with two spaces
         print(2 * " ", end="")
         # print right half of pyramid
         print(i * "#")
