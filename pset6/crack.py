@@ -1,64 +1,42 @@
 import sys
 import crypt
 import string
-# a = aa0wSaCDPDEl2
+import itertools
 
 
 def main():
+    # sanity check
     if(len(sys.argv) != 2):
         print("Usage: ./crack hash")
         exit(1)
 
+    # take user parameter as encrypted password to crack
     encrypted = sys.argv[1]
-    decrypt(encrypted)
+    decrypt(encrypted, 4)
 
 
-def decrypt(encryptedText):
-    # first two characters is salt
+def decrypt(encryptedText, pwdlength):
+    # first two characters equall salt
     salt = encryptedText[:2]
 
-    # Check for 1-char password
-    for i in range(0, len(string.ascii_letters)):
-        currString = string.ascii_letters[i]
-        hashed = crypt.crypt(currString, salt)
-        if hashed == encryptedText:
-            print(currString)
-            exit(0)
+    charset = string.ascii_letters
 
-    # Check for 2-char password
-    for i in range(0, len(string.ascii_letters)):
-        for j in range(0, len(string.ascii_letters)):
-            currString = string.ascii_letters[i] + string.ascii_letters[j]
-            hashed = crypt.crypt(currString, salt)
+    # this generates every combination of given letters for hash checking
+    # thanks to ecatmur from StackOverflow for this line!
+    generator = itertools.chain. \
+        from_iterable((''.join(l)
+                       for l in itertools.product(charset, repeat=i))
+                      for i in range(1, pwdlength + 1))
+
+    for password in generator:
+            hashed = crypt.crypt(str(password), salt)
+
+            # if found - print password and exit
             if hashed == encryptedText:
-                print(currString)
+                print(password)
                 exit(0)
 
-    # Check for 3-char password
-    for i in range(0, len(string.ascii_letters)):
-        for j in range(0, len(string.ascii_letters)):
-            for k in range(0, len(string.ascii_letters)):
-                currString = string.ascii_letters[i]
-                + string.ascii_letters[j]
-                + string.ascii_letters[k]
-                hashed = crypt.crypt(currString, salt)
-                if hashed == encryptedText:
-                    print(currString)
-                    exit(0)
-
-    # Check for 4-char password
-    for i in range(0, len(string.ascii_letters)):
-        for j in range(0, len(string.ascii_letters)):
-            for k in range(0, len(string.ascii_letters)):
-                for l in range(0, len(string.ascii_letters)):
-                    currString = string.ascii_letters[i]
-                    + string.ascii_letters[j]
-                    + string.ascii_letters[k]
-                    + string.ascii_letters[l]
-                    hashed = crypt.crypt(currString, salt)
-                    if hashed == encryptedText:
-                        print(currString)
-                        exit(0)
+    print("Hash incorrect or password longer than 4 characters!")
 
 
 if __name__ == '__main__':
