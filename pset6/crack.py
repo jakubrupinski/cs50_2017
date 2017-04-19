@@ -1,6 +1,6 @@
 import sys
 import crypt
-
+import string
 # a = aa0wSaCDPDEl2
 
 
@@ -18,38 +18,43 @@ def decrypt(encryptedText):
     salt = encryptedText[:2]
 
     # Check for 1-char password
-    for i in range(ord('a'), ord('z')):
-        currString = chr(i)
+    for i in range(0, len(string.ascii_letters)):
+        currString = string.ascii_letters[i]
         hashed = crypt.crypt(currString, salt)
         if hashed == encryptedText:
             print(currString)
             exit(0)
 
     # Check for 2-char password
-    for i in range(ord('a'), ord('z')):
-        for j in range(ord('a'), ord('z')):
-            currString = chr(i) + chr(j)
+    for i in range(0, len(string.ascii_letters)):
+        for j in range(0, len(string.ascii_letters)):
+            currString = string.ascii_letters[i] + string.ascii_letters[j]
             hashed = crypt.crypt(currString, salt)
             if hashed == encryptedText:
                 print(currString)
                 exit(0)
 
     # Check for 3-char password
-    for i in range(ord('a'), ord('z')):
-        for j in range(ord('a'), ord('z')):
-            for k in range(ord('a'), ord('z')):
-                currString = chr(i) + chr(j) + chr(k)
+    for i in range(0, len(string.ascii_letters)):
+        for j in range(0, len(string.ascii_letters)):
+            for k in range(0, len(string.ascii_letters)):
+                currString = string.ascii_letters[i]
+                + string.ascii_letters[j]
+                + string.ascii_letters[k]
                 hashed = crypt.crypt(currString, salt)
                 if hashed == encryptedText:
                     print(currString)
                     exit(0)
 
     # Check for 4-char password
-    for i in range(ord('a'), ord('z')):
-        for j in range(ord('a'), ord('z')):
-            for k in range(ord('a'), ord('z')):
-                for l in range(ord('a'), ord('z')):
-                    currString = chr(i) + chr(j) + chr(k) + chr(l)
+    for i in range(0, len(string.ascii_letters)):
+        for j in range(0, len(string.ascii_letters)):
+            for k in range(0, len(string.ascii_letters)):
+                for l in range(0, len(string.ascii_letters)):
+                    currString = string.ascii_letters[i]
+                    + string.ascii_letters[j]
+                    + string.ascii_letters[k]
+                    + string.ascii_letters[l]
                     hashed = crypt.crypt(currString, salt)
                     if hashed == encryptedText:
                         print(currString)
