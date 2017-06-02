@@ -1,5 +1,7 @@
 # My solutions to the CS50 problem sets
 
+There are way more commits that were made, most of them are inside git repos that are inside pset folders!
+
 - pset1 - Drawing a Mario pyramid in console, credit card validity checker, hello world, water usage calculator. 
 - pset2 - Caesar cryptographer, Initials prints initials from user's name, Vigenere cryptographer.
 - pset3 - Binary searching for a number value in a big file, Fifteen is a game of fifteen on a d x d dimensions board.
